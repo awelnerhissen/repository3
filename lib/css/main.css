@@ -1,0 +1,20 @@
+.error {
+	color: #FF0000;
+}
+fieldset { border:2px dotted grey}
+
+legend {
+  padding: 0.2em 0.5em;
+  border:2px dotted  grey ;
+  font-size:90%;
+  text-align:left;
+  font-weight:bold;
+  }
+  label {
+  float:left;
+  width:38%;
+  margin-right:0.5em;
+  padding-top:0.2em;
+  text-align:right;
+  text-weight: thin;
+  }
