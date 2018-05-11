@@ -1,28 +1,7 @@
 <?php 
 	require_once '../lib/memeberManagement.php';
  	require_once 'config.php';
- 
- 	$personalNumber;
- 	$dateOfBirth;
- 	$firstName;
- 	$fatherName;
- 	$gFatherName;
- 	$sex;
- 	$maritalStatus=0;
- 	$residenceStatus=0;
- 	$primaryEmail;
- 	$email2;
- 	$password;
- 	$confirmPassword;
- 	$mobileNumber;
- 	$mobileNumber2;
- 	$telephoneNumber;
- 	$city;
- 	$streetAddress;
- 	$poBox;
- 	$kommun;
- 	$country;
- 	
+ 	require_once 'inc/memberRegistrationVariables.php';
  	
  	if($_SERVER["REQUEST_METHOD"] == "POST") {
  	    $personalNumber = $memberManagement->test_input($_POST["txtPersonalNumber"]);
@@ -45,7 +24,13 @@
  	    $poBox= $memberManagement->test_input($_POST["txtPoBox"]);
  	    $kommun= $memberManagement->test_input($_POST["txtKommun"]);
  	    $country = $memberManagement->test_input($_POST["txtCountry"]);
+ 	    
+ 	    $PersonalNumberErr =  $memberManagement->checkInputData($personalNumber, "Personal number", 3, true);
+ 	    $dateOfBirthlErr = $memberManagement->checkInputData($dateOfBirth, "Date of birth", 2, true, "", "19671225 or 1967-12-25");
+ 	    $firstNameErr = $memberManagement->checkInputData($firstName, "First name", 1, true);
+ 	    
  	}
+ 	
 ?>
 
 <!DOCTYPE html>
@@ -97,6 +82,7 @@
   <span class="error"><?php echo $primaryEmailErr;?></span>
   <br><br>
     <label for="email2">Email2:</label> <input type="email" name="email2" value="<?php echo $email2;?>">
+  <span class="error"><?php echo $email2Err;?></span>
   <br><br>
     <label for="password">Password:</label>  <input type="password" name="password" value="<?php echo $password;?>">
   <span class="error"><?php echo $passwordErr;?></span>
@@ -108,8 +94,10 @@
   <span class="error"><?php echo $mobileNumberErr;?></span>
   <br><br>
      <label for="mobileNumber2">Mobile number2:</label><input type="text" name="txtMobileNumber2" value="<?php echo $mobileNumber2;?>">
+  <span class="error"><?php echo $mobileNumber2Err;?></span>
   <br><br>
    <label for="telephoneNumber">Telephone number:</label> <input type="text" name="txtTelephoneNumber" value="<?php echo $telephoneNumber;?>">
+  <span class="error"><?php echo $telephoneNumberErr;?></span>
   <br><br>
    <!-- <fieldset style="width:330px"> -->
    <fieldset style="width:100%">
@@ -124,6 +112,7 @@
   <span class="error"><?php echo $poBoxErr;?></span>
   <br><br>
         <label for="txtKommun">Kommun:</label> <input type="text" name="txtKommun" value="<?php echo $kommun;?>">
+   <span class="error"><?php echo $kommunErr;?></span>
   <br><br>
         <label for="Country:">Country:</label> <input type="text" name="txtCountry" value="Sweden" disabled="disabled">
         </fieldset>

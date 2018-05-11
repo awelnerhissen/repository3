@@ -45,6 +45,65 @@ class MemberManagement{
         return $data;
     }
     
+    /**
+     *
+     * Check validty of the input data
+     * @param String $input
+     * @param String $inputName
+     * @param int $validationType
+     *        1 Only letters and white space allowed
+     *        2 Only numbers and - allowed
+     *        3 Only numbers - and white space allowed
+     *        4 Only numbers - + and white space allowed
+     *        10 Check only if the input is empty if empty is not allowed.
+     * @param String $errorMessag replace error message by this when the input data is invalid.
+     * @param boolean $checkEmpty
+     * @param String $example add this exmaple to error when the input data is invalid
+     * @return string
+     */
+    
+    function checkInputData($input, $inputName, $validationType, $checkEmpty,  $errorMessag="", $example=""){
+        $ONLY_LETTERS_AND_WHITE_SPACE = "/^[a-zA-ZåäöÅÄÖ ]*$/";
+        $ONLY_NUMBERS_AND_HYPHEN = "/^[0-9-]*$/";
+        $ONLY_NUMBERS_AND_WHITE_SPACE_AND_HYPHEN = "/^[0-9- ]*$/";
+        $ONLY_NUMBERS_AND_WHITE_SPACE_AND_HYPHEN_PLUS = "/^[0-9-+ ]*$/";
+        
+        
+        $strError = "";
+        $regularExpression ="";
+        $errorMessageWhenInvalid="";
+        if ($checkEmpty && empty($input)) {
+            $strError = $inputName. " is required";
+        } else if ($validationType!=10){
+            if($validationType==1){
+                $regularExpression = $ONLY_LETTERS_AND_WHITE_SPACE;
+                $errorMessageWhenInvalid="Only letters and white space allowed";
+            }else if($validationType==2){
+                $regularExpression = $ONLY_NUMBERS_AND_HYPHEN;
+                $errorMessageWhenInvalid="Only numbers and - allowed";
+            }else if($validationType==3){
+                $regularExpression = $ONLY_NUMBERS_AND_WHITE_SPACE_AND_HYPHEN;
+                $errorMessageWhenInvalid="Only numbers - and white space allowed";
+            }else if($validationType==4){
+                $regularExpression = $ONLY_NUMBERS_AND_WHITE_SPACE_AND_HYPHEN_PLUS;
+                $errorMessageWhenInvalid="Only numbers - + and white space allowed";
+            }
+            
+            if($errorMessag !=""){
+                $errorMessageWhenInvalid = $errorMessag;
+            }
+            
+            if($example !=""){
+                $errorMessageWhenInvalid .= " e.g ". $example;
+            }
+            // check if name only contains letters and whitespace
+            if (!preg_match($regularExpression,$input)) {
+                $strError = $errorMessageWhenInvalid;
+            }
+        }
+        return $strError;
+    }
+    
     
     /**
      * Get list of marital status in prepared select form.
@@ -107,5 +166,6 @@ class MemberManagement{
          return $result;
      }
     }
+    
 }
 ?>
