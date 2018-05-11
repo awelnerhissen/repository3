@@ -1,28 +1,7 @@
 <?php 
 	require_once '../lib/memeberManagement.php';
  	require_once 'config.php';
- 
- 	$personalNumber;
- 	$dateOfBirth;
- 	$firstName;
- 	$fatherName;
- 	$gFatherName;
- 	$sex;
- 	$maritalStatus=0;
- 	$residenceStatus=0;
- 	$primaryEmail;
- 	$email2;
- 	$password;
- 	$confirmPassword;
- 	$mobileNumber;
- 	$mobileNumber2;
- 	$telephoneNumber;
- 	$city;
- 	$streetAddress;
- 	$poBox;
- 	$kommun;
- 	$country;
- 	
+ 	require_once 'inc/memberRegistrationVariables.php';
  	
  	if($_SERVER["REQUEST_METHOD"] == "POST") {
  	    $personalNumber = $memberManagement->test_input($_POST["txtPersonalNumber"]);
@@ -45,7 +24,29 @@
  	    $poBox= $memberManagement->test_input($_POST["txtPoBox"]);
  	    $kommun= $memberManagement->test_input($_POST["txtKommun"]);
  	    $country = $memberManagement->test_input($_POST["txtCountry"]);
+ 	    
+ 	    $PersonalNumberErr =  $memberManagement->checkInputData($personalNumber, "Personal number", 2, true);
+ 	    $dateOfBirthlErr = $memberManagement->checkInputData($dateOfBirth, "Date of birth", 2, true, "", "19671225 or 1967-12-25");
+ 	    $firstNameErr = $memberManagement->checkInputData($firstName, "First name", 1, true);
+ 	    $fatherNameErr = $memberManagement->checkInputData($fatherName, "Father name", 1, false);
+ 	    $gFatherNameErr = $memberManagement->checkInputData($gFatherName, "G.Father/Last name", 1, true);
+ 	    $sexErr=$memberManagement->checkSelectedSex($sex);
+ 	    $primaryEmailErr = $memberManagement->checkEmail($primaryEmail, true);
+ 	    $email2Err = $memberManagement->checkEmail($email2, false);
+ 	    $ConfirmPasswordErr=$passwordErr = $memberManagement->checkPassword($password, $confirmPassword, true);
+ 	    $mobileNumberErr = $memberManagement->checkMobileNumber($mobileNumber,true);
+ 	    $mobileNumber2Err  = $memberManagement->checkMobileNumber($mobileNumber2, false);
+ 	    $telephoneNumberErr  = $memberManagement->checkMobileNumber($telephoneNumber, false);
+ 	    
+ 	    $cityErr =$memberManagement->checkInputData($city, "City", 1, true);
+ 	    $streetAddressErr = $memberManagement->checkInputData($streetAddress, "Street address", 10, true);
+ 	    $poBoxErr = $memberManagement->checkInputData($poBox, "Po.Box", 3, true);
+ 	    $kommunErr = $memberManagement->checkInputData($kommun, "Kommun", 1, true);
+ 	    
+ 	    
+ 	    
  	}
+ 	
 ?>
 
 <!DOCTYPE html>
@@ -76,7 +77,7 @@
   <label for="txtFatherName">Father name:</label> <input type="text" name="txtFatherName" value="<?php echo $fatherName;?>">
   <span class="error"><?php echo $fatherNameErr;?></span>
   <br><br>
-  <label for="txtGFatherName">G.Father name:</label> <input type="text" name="txtGFatherName" value="<?php echo $gFatherName;?>">
+  <label for="txtGFatherName">G.Father/Last name:</label> <input type="text" name="txtGFatherName" value="<?php echo $gFatherName;?>">
   <span class="error"><?php echo $gFatherNameErr;?></span>
   <br><br>
   <label for="selectSex">Sex</label> 
@@ -84,8 +85,8 @@
   <option value="0"<?php if(isset($sex) && $sex=="0") echo "selected = 'selected'";?>></option>
   <option value="1"<?php if(isset($sex) && $sex=="1") echo "selected = 'selected'";?>>Male</option>
   <option value="2"<?php if(isset($sex) && $sex=="2") echo "selected = 'selected'";?>>Female</option>
-  <?php if (isset($gender) && $gender=="female") echo "checked";?>
 </select>
+<span class="error"><?php echo $sexErr;?></span>
    <br><br>
     <label for="selectMeritalStatus">Meriatal Status:</label> 
    <?php echo $memberManagement->getMeritalStatusSelect($maritalStatus);?>
@@ -97,6 +98,7 @@
   <span class="error"><?php echo $primaryEmailErr;?></span>
   <br><br>
     <label for="email2">Email2:</label> <input type="email" name="email2" value="<?php echo $email2;?>">
+  <span class="error"><?php echo $email2Err;?></span>
   <br><br>
     <label for="password">Password:</label>  <input type="password" name="password" value="<?php echo $password;?>">
   <span class="error"><?php echo $passwordErr;?></span>
@@ -108,8 +110,10 @@
   <span class="error"><?php echo $mobileNumberErr;?></span>
   <br><br>
      <label for="mobileNumber2">Mobile number2:</label><input type="text" name="txtMobileNumber2" value="<?php echo $mobileNumber2;?>">
+  <span class="error"><?php echo $mobileNumber2Err;?></span>
   <br><br>
    <label for="telephoneNumber">Telephone number:</label> <input type="text" name="txtTelephoneNumber" value="<?php echo $telephoneNumber;?>">
+  <span class="error"><?php echo $telephoneNumberErr;?></span>
   <br><br>
    <!-- <fieldset style="width:330px"> -->
    <fieldset style="width:100%">
@@ -124,6 +128,7 @@
   <span class="error"><?php echo $poBoxErr;?></span>
   <br><br>
         <label for="txtKommun">Kommun:</label> <input type="text" name="txtKommun" value="<?php echo $kommun;?>">
+   <span class="error"><?php echo $kommunErr;?></span>
   <br><br>
         <label for="Country:">Country:</label> <input type="text" name="txtCountry" value="Sweden" disabled="disabled">
         </fieldset>
