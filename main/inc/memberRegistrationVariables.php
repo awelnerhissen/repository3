@@ -25,6 +25,7 @@ $dateOfBirthlErr;
 $firstNameErr;
 $fatherNameErr;
 $gFatherNameErr;
+$sexErr;
 $primaryEmailErr;
 $email2Err;
 $passwordErr;
@@ -36,4 +37,5 @@ $cityErr;
 $streetAddressErr;
 $poBoxErr;
 $kommunErr;
+
 ?>
