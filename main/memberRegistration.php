@@ -85,17 +85,17 @@
  	    foreach($errorMessages as $errorMessage => $errorMessage_value) {
  	        if(!empty($errorMessage_value)){
  	            $isValidData=false;
- 	            $kommunErr = $errorMessage . " ". $errorMessage_value;
  	            break;
  	        }
  	        
  	    }
- 	    
+ 	    $registrationSuccessful=false;
+ 	    $messageStyle ="error";
  	    if($isValidData){
  	        $memberId = $memberManagement->getAvailableMemberId();
  	        $memberData = array("memberId"=>$memberId,
  	            "personalNumber"=>$personalNumber,
- 	            "dateOfBirth"=>$dateOfBirthl,
+ 	            "dateOfBirth"=>$dateOfBirth,
  	            "firstName"=>$firstName,
  	            "fatherName"=>$fatherName,
  	            "gFatherName"=>$gFatherName,
@@ -114,7 +114,33 @@
  	            "country"=>$country,
  	            "kommun"=>$kommun);
  	        $registrationSuccessful = $memberManagement->registerMember($memberData);
- 	        $kommunErr = $registrationSuccessful;
+ 	    }
+ 	    if($registrationSuccessful){
+ 	        $registrationMessage ="Thank you. You have been registered successfully";
+ 	        $messageStyle ="successRegistration";
+ 	        //clear data
+ 	        $personalNumber="";
+ 	        $dateOfBirth="";
+ 	        $firstName="";
+ 	        $fatherName="";
+ 	        $gFatherName="";
+ 	        $sex="0";
+ 	        $maritalStatus="4";
+ 	        $residenceStatus="6";
+ 	        $primaryEmail="";
+ 	        $email2="";
+ 	        $password="";
+ 	        $confirmPassword="";
+ 	        $mobileNumber="";
+ 	        $mobileNumber2="";
+ 	        $telephoneNumber="";
+ 	        $city="";
+ 	        $streetAddress="";
+ 	        $poBox="";
+ 	        $kommun="";
+ 	    }else{
+ 	        $registrationMessage ="Some fields has not been field correctly. Please update them.";
+ 	        $messageStyle ="error";
  	    }
  	    
  	    
@@ -140,7 +166,7 @@
 
 <p><span class="error">* required field</span></p>
 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?> "id="memberRegistration">  
-  <span class="error"> <?php echo $registrationMessage;?></span>
+  <span class='<?php echo $messageStyle;?>'> <?php echo $registrationMessage;?></span>
   <br><br>
   <label for="txtPersonalNumber">Personal number:</label><input type="text" name="txtPersonalNumber" value="<?php echo $personalNumber;?>">
   <span class="error">* <?php echo $personalNumberErr;?></span>
@@ -149,13 +175,13 @@
   <span class="error">* <?php echo $dateOfBirthlErr;?></span>
   <br><br>
   <label for="txtFirstName">First name: </label><input type="text" name="txtFirstName" value="<?php echo $firstName;?>">
-  <span class="error"><?php echo $firstNameErr;?></span>
+  <span class="error">*<?php echo $firstNameErr;?></span>
   <br><br>
   <label for="txtFatherName">Father name:</label> <input type="text" name="txtFatherName" value="<?php echo $fatherName;?>">
   <span class="error"><?php echo $fatherNameErr;?></span>
   <br><br>
   <label for="txtGFatherName">G.Father/Last name:</label> <input type="text" name="txtGFatherName" value="<?php echo $gFatherName;?>">
-  <span class="error"><?php echo $gFatherNameErr;?></span>
+  <span class="error">*<?php echo $gFatherNameErr;?></span>
   <br><br>
   <label for="selectSex">Sex</label> 
 <select name="selectSex" form="memberRegistration">
@@ -163,7 +189,7 @@
   <option value="m"<?php if(isset($sex) && $sex=="m") echo "selected = 'selected'";?>>Male</option>
   <option value="f"<?php if(isset($sex) && $sex=="f") echo "selected = 'selected'";?>>Female</option>
 </select>
-<span class="error"><?php echo $sexErr;?></span>
+<span class="error">*<?php echo $sexErr;?></span>
    <br><br>
     <label for="selectMeritalStatus">Meriatal Status:</label> 
    <?php echo $memberManagement->getMeritalStatusSelect($maritalStatus);?>
@@ -172,19 +198,19 @@
    <?php echo $memberManagement->getResidenceStatusSelect($residenceStatus)?>
    <br><br>
     <label for="primaryEmail">Primary email:</label> <input type="email" name="primaryEmail" value="<?php echo $primaryEmail;?>">
-  <span class="error"><?php echo $primaryEmailErr;?></span>
+  <span class="error">*<?php echo $primaryEmailErr;?></span>
   <br><br>
     <label for="email2">Email2:</label> <input type="email" name="email2" value="<?php echo $email2;?>">
   <span class="error"><?php echo $email2Err;?></span>
   <br><br>
     <label for="password">Password:</label>  <input type="password" name="password" value="<?php echo $password;?>">
-  <span class="error"><?php echo $passwordErr;?></span>
+  <span class="error">*<?php echo $passwordErr;?></span>
   <br><br>
     <label for="confirmPassword">Confirm Password:</label> <input type="password" name="confirmPassword" value="<?php echo $confirmPassword;?>">
-  <span class="error"><?php echo $ConfirmPasswordErr;?></span>
+  <span class="error">*<?php echo $ConfirmPasswordErr;?></span>
   <br><br>
    <label for="mobileNumber">Mobile number:</label><input type="text" name="txtMobileNumber" value="<?php echo $mobileNumber;?>">
-  <span class="error"><?php echo $mobileNumberErr;?></span>
+  <span class="error">*<?php echo $mobileNumberErr;?></span>
   <br><br>
      <label for="mobileNumber2">Mobile number2:</label><input type="text" name="txtMobileNumber2" value="<?php echo $mobileNumber2;?>">
   <span class="error"><?php echo $mobileNumber2Err;?></span>
@@ -196,13 +222,13 @@
    <fieldset style="width:100%">
   <legend>Residental address:</legend>
      <label for="txtCity">City:</label> <input type="text" name="txtCity" value="<?php echo $city;?>">
-  <span class="error"><?php echo $cityErr;?></span>
+  <span class="error">*<?php echo $cityErr;?></span>
   <br><br>
       <label for="txtStreetAddress">Street Address:</label> <input type="text" name="txtStreetAddress" value="<?php echo $streetAddress;?>">
-  <span class="error"><?php echo $streetAddressErr;?></span>
+  <span class="error">*<?php echo $streetAddressErr;?></span>
   <br><br>
         <label for="txtPoBox">Po.Box:</label> <input type="text" name="txtPoBox" value="<?php echo $poBox;?>">
-  <span class="error"><?php echo $poBoxErr;?></span>
+  <span class="error">*<?php echo $poBoxErr;?></span>
   <br><br>
         <label for="txtKommun">Kommun:</label> <input type="text" name="txtKommun" value="<?php echo $kommun;?>">
    <span class="error"><?php echo $kommunErr;?></span>

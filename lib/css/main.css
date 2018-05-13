@@ -1,6 +1,9 @@
 .error {
 	color: #FF0000;
 }
+.successRegistration{
+	color: #00FF00;
+}
 fieldset { border:2px dotted grey}
 
 legend {

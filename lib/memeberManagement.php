@@ -280,7 +280,7 @@ class MemberManagement{
         if($result){
            $this->incrementAvailableMemberId(); 
         }
-        return $tblContactAddress;
+        return $result;
     }
     /**
      * Password hash function
