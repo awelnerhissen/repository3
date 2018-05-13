@@ -66,7 +66,7 @@ class MemberManagement{
         $ONLY_LETTERS_AND_WHITE_SPACE = "/^[a-zA-ZåäöÅÄÖ ]*$/";
         $ONLY_NUMBERS_AND_HYPHEN = "/^[0-9-]*$/";
         $ONLY_NUMBERS_AND_WHITE_SPACE_AND_HYPHEN = "/^[0-9- ]*$/";
-        $ONLY_NUMBERS_AND_WHITE_SPACE_AND_HYPHEN_PLUS = "/^[0-9-+ ]*$/";
+        $ONLY_NUMBERS_AND_WHITE_SPACE_AND_HYPHEN_AND_PLUS = "/^[0-9-+ ]*$/";
         
         
         $strError = "";
@@ -85,9 +85,10 @@ class MemberManagement{
                 $regularExpression = $ONLY_NUMBERS_AND_WHITE_SPACE_AND_HYPHEN;
                 $errorMessageWhenInvalid="Only numbers - and white space allowed";
             }else if($validationType==4){
-                $regularExpression = $ONLY_NUMBERS_AND_WHITE_SPACE_AND_HYPHEN_PLUS;
+                $regularExpression = $ONLY_NUMBERS_AND_WHITE_SPACE_AND_HYPHEN_AND_PLUS;
                 $errorMessageWhenInvalid="Only numbers - + and white space allowed";
             }
+            
             
             if($errorMessag !=""){
                 $errorMessageWhenInvalid = $errorMessag;
@@ -102,6 +103,97 @@ class MemberManagement{
             }
         }
         return $strError;
+    }
+    
+    /**
+     * Validate if sex has been selected/filled
+     * @param String $selectedSex
+     * @return string
+     */
+    function checkSelectedSex($selectedSex){
+        $strError="";
+        if($selectedSex=="0"){
+            $strError="Fill your sex.";
+        }
+        return $strError;
+    }
+    
+    /**
+     * Check if email is valid email. Skip checking email if $checkEmail 
+     * is false and $email is empy.
+     * 
+     * @param String $email
+     * @param boolean $checkEmpty
+     */
+    function checkEmail($email, $checkEmpty){
+        $validateEmail = true;
+        $emailErr="";
+        if (!$checkEmpty && empty($email)){
+            $validateEmail = false;
+        }
+        if($validateEmail){
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $emailErr = "Invalid email format";
+            }
+        }
+        return $emailErr;
+    }
+    
+   /**
+    * 
+    * @param String $number
+    * @param String $checkEmpty
+    */
+    function checkMobileNumber($number, $checkEmpty){
+        $ONLY_NUMBERS_AND_WHITE_SPACE_AND_HYPHEN_AND_PLUS = "/^[0-9-+ ]*$/";
+        $validateNumber = true;
+        $minimumMobileOrTelephoneNumberLength = 10; //e.g 0735618xxxx
+        $numberError="";
+        if (!$checkEmpty && empty($minimumMobileOrTelephoneNumberLength)){
+            $validateNumber = false;
+        }
+        if($validateNumber){
+            if(strlen($number)<10){
+                $numberError="Invalid number";
+                return $numberError;
+            }
+            if( !preg_match($ONLY_NUMBERS_AND_WHITE_SPACE_AND_HYPHEN_AND_PLUS,$number)){
+                $numberError="Only numbers - + and white space allowed";
+                return $numberError;
+            }
+        }
+        return $numberError;
+        
+    }
+    
+    /**
+     * Validate if passowrd fullfills some requirements.
+     * @param String $password
+     * @param String $confirmPassword
+     * @param boolean $useStrongPass
+     * @return string
+     */
+    function checkPassword($password, $confirmPassword, $useStrongPass){
+        //&&!preg_match( $digitsRegExp, $password) && !preg_match($specialCharacterRegExp, $password)
+        //&& !preg_match( $alphabetsRegExp, $password) && !preg_match( $digitsRegExp, $password)
+        $strErr =  "";
+        $alphabetsRegExp='/[a-zA-Z]+/'; //match characters a to z or A to Z
+        $digitsRegExp='/\d+/'; //match digits
+        $specialCharacterRegExp ='/\W+/';
+        if(strlen($password)<6){
+            $strErr ="Password length at least 6 characters.";
+            return $strErr;
+        }
+        if($useStrongPass  && (!preg_match( $alphabetsRegExp, $password) || !preg_match( $digitsRegExp, $password) || !preg_match( $specialCharacterRegExp, $password))){
+                $strErr ="Password must have at least one character, one digit and one special symbol.";
+                return $strErr;
+        }
+        if($password != $confirmPassword){
+            $strErr ="Password and Confirm password are not the same.";
+            return $strErr;
+        }
+        
+        
     }
     
     
