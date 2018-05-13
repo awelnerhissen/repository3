@@ -20,7 +20,7 @@ $poBox;
 $kommun;
 $country;
 
-$PersonalNumberErr;
+$personalNumberErr;
 $dateOfBirthlErr;
 $firstNameErr;
 $fatherNameErr;
@@ -37,5 +37,10 @@ $cityErr;
 $streetAddressErr;
 $poBoxErr;
 $kommunErr;
+$commulativeErr;
+
+$registrationMessage;
+$registrationSuccessful;
+$isValidData;
 
 ?>

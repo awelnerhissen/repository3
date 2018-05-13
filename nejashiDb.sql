@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: May 12, 2018 at 09:55 AM
+-- Generation Time: May 13, 2018 at 01:30 PM
 -- Server version: 5.7.22-0ubuntu0.16.04.1
 -- PHP Version: 7.0.28-0ubuntu0.16.04.1
 
@@ -47,10 +47,10 @@ CREATE TABLE `tblBasicInformation` (
   `lastName` varchar(20) NOT NULL,
   `gender` char(1) NOT NULL,
   `dateOfBirth` date NOT NULL,
-  `peronalNumber` int(12) NOT NULL,
+  `peronalNumber` bigint(20) NOT NULL,
   `familyStatus` int(11) NOT NULL,
   `residentStatus` int(11) NOT NULL,
-  `pictureLink` text NOT NULL,
+  `pictureLink` text,
   `registrationDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `updateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -63,11 +63,9 @@ CREATE TABLE `tblBasicInformation` (
 
 CREATE TABLE `tblContactAddress` (
   `memberId` int(11) NOT NULL,
-  `mobileNumber1` int(11) NOT NULL,
-  `mobileNumber2` int(11) NOT NULL,
-  `telephone` int(11) NOT NULL,
-  `email1` varchar(30) NOT NULL,
-  `email2` varchar(30) NOT NULL,
+  `mobileNumber1` text NOT NULL,
+  `mobileNumber2` text NOT NULL,
+  `telephone` text NOT NULL,
   `country` varchar(20) NOT NULL,
   `city` varchar(20) NOT NULL,
   `kommun` varchar(20) NOT NULL,
@@ -99,6 +97,22 @@ INSERT INTO `tblFamilyStatusTypes` (`familyStatusId`, `familyStatusType`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `tblLogin`
+--
+
+CREATE TABLE `tblLogin` (
+  `memberId` int(11) NOT NULL,
+  `primaryEmail` varchar(50) NOT NULL,
+  `email2` varchar(50) DEFAULT NULL,
+  `password` varchar(255) NOT NULL,
+  `memberRole` int(11) NOT NULL,
+  `confirmed` int(11) NOT NULL,
+  `ConfirmationCode` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `tblMemberId`
 --
 
@@ -111,7 +125,7 @@ CREATE TABLE `tblMemberId` (
 --
 
 INSERT INTO `tblMemberId` (`availableId`) VALUES
-(1);
+(1020);
 
 -- --------------------------------------------------------
 
@@ -216,6 +230,12 @@ ALTER TABLE `tblContactAddress`
 --
 ALTER TABLE `tblFamilyStatusTypes`
   ADD UNIQUE KEY `familtyStatusId` (`familyStatusId`);
+
+--
+-- Indexes for table `tblLogin`
+--
+ALTER TABLE `tblLogin`
+  ADD PRIMARY KEY (`memberId`);
 
 --
 -- Indexes for table `tblRelationShipKind`

@@ -145,15 +145,17 @@ class MemberManagement{
     * @param String $checkEmpty
     */
     function checkMobileNumber($number, $checkEmpty){
+        $numberLocal="";
         $ONLY_NUMBERS_AND_WHITE_SPACE_AND_HYPHEN_AND_PLUS = "/^[0-9-+ ]*$/";
         $validateNumber = true;
         $minimumMobileOrTelephoneNumberLength = 10; //e.g 0735618xxxx
         $numberError="";
-        if (!$checkEmpty && empty($minimumMobileOrTelephoneNumberLength)){
+        if (!$checkEmpty && empty($number)){
             $validateNumber = false;
         }
         if($validateNumber){
-            if(strlen($number)<10){
+            $numberLocal = $this->changeMobileOrTelephoneNumberForm($number);
+            if(strlen($number)<$minimumMobileOrTelephoneNumberLength){
                 $numberError="Invalid number";
                 return $numberError;
             }
@@ -194,6 +196,189 @@ class MemberManagement{
         }
         
         
+    }
+    /**
+     * Change personal number to fixed form, 12 digits only
+     * @param  $personalNumber
+     * @return int persona number in fixed form.
+     */
+    function changePersonalNumberForm($personalNumber){
+        return $this->removeSpaceAndhyphen($personalNumber);
+        
+    }
+    
+    /**
+     * Remove white space and - from $input
+     * @param String $intput
+     * @return mixed
+     */
+    function removeSpaceAndhyphen($intput){
+        $updatedInput = str_replace("-", "",$intput);
+        $updatedInput = str_replace(" ", "",$updatedInput);
+        return $updatedInput;
+        
+    }
+    
+    /**
+     * Change mobile or telephone number to fixed form.
+     * @param  $personalNumber
+     * @return int mobile or telephone number in fixed form.
+     */
+    function changeMobileOrTelephoneNumberForm($mobileOrTelephoneNumber){
+        $mobileOrTelephoneNumberNumberForm = $this->removeSpaceAndhyphen($mobileOrTelephoneNumber);
+        $$mobileOrTelephoneNumberNumberForm = str_replace("+", "00",$$mobileOrTelephoneNumberNumberForm);
+        return $mobileOrTelephoneNumberNumberForm;
+        
+    }
+    
+    /**
+     * Validate personal number
+     * @param  $personalNumber
+     * @return String, empty of $personalNumber is valid otherwise error message. 
+     */
+    function validatePersonalNumber($personalNumber){
+        $personalNumberErr = $this->checkInputData($personalNumber, "Personal number", 2, true);
+        if(empty($personalNumberErr) && !empty($personalNumber)){
+            $personalNumberForm = $this->changePersonalNumberForm($personalNumber);
+            $firstTwoDigit = substr($personalNumberForm, 0, 2);
+            if(strlen($personalNumberForm)!=12 || ($firstTwoDigit!="19" && $firstTwoDigit!="20")){
+                $personalNumberErr = "Invalid personal number";
+            }
+        }
+        return $personalNumberErr;
+    }
+    function incrementAvailableMemberId(){
+        $pdo = $this->pdo;
+        $stmt = $pdo->prepare('update tblMemberId set availableId= availableId+1');
+        $stmt->execute();
+    }
+    
+    function registerMember($data){
+        $hashedPassword = $this->hashPass($data['password']);
+        $personalNumberWithoutSpace = $this->removeSpaceAndhyphen($data['personalNumber']);
+        $date = $data['dateOfBirth'];
+        if(empty($date)){
+            $date = $this->getDateOfBirthFromPersonalNumber($personalNumberWithoutSpace);
+        }
+        
+        if(empty($personalNumberWithoutSpace)){
+            $personalNumberWithoutSpace = $date;
+        }
+        $pdo = $this->pdo;
+        $pdo->beginTransaction();
+        $tblBasicInformation = "INSERT INTO tblBasicInformation (memberId, firstName, fatherName, lastName, gender, dateOfBirth, peronalNumber,familyStatus, residentStatus)
+                  VALUES (".$data['memberId']." , '".$data['firstName']."' , '".$data['fatherName']."' , '".$data['gFatherName']."' , '".$data['sex']."' , '".$date."' , ".$personalNumberWithoutSpace." , ".$data['familyStatus']." , ".$data['residentStatus'].")";
+        $pdo->exec($tblBasicInformation);
+        $tblLoginSql = "INSERT INTO tblLogin (memberId, primaryEmail, email2, password, memberRole, confirmed, ConfirmationCode)
+                  VALUES (".$data['memberId']." , '".$data['primaryEmail']."' , '".$data['email2']."' , '".$hashedPassword."' , 1, 1, 'confirmationCode')";
+        $pdo->exec($tblLoginSql);
+        $tblContactAddress = "INSERT INTO tblContactAddress (memberId, mobileNumber1, mobileNumber2, telephone, country, city, kommun, streetAddress, poBox)
+                  VALUES (".$data['memberId']." , '".$data['mobileNumber']."' , '".$data['mobileNumber2']."' , '".$data['telephoneNumber']."' , '".
+                  $data['country']."' , '".$data['city']."' , '".$data['kommun']."' , '".$data['streetAddress']."' , '".$data['poBox']."')";
+        $pdo->exec($tblContactAddress);
+        $result = $pdo->commit();
+        if($result){
+           $this->incrementAvailableMemberId(); 
+        }
+        return $tblContactAddress;
+    }
+    /**
+     * Password hash function
+     * @param string $password User password.
+     * @return string $password Hashed password.
+     */
+    private function hashPass($pass){
+        return password_hash($pass, PASSWORD_DEFAULT);
+    }
+    
+    /**
+     * Validate date of birth
+     * @param String $dateOfBirth
+     * @param String $personalNumber
+     * @return string empty string if $dateOfBirth is valid otherwise error message.
+     */
+    function validateDateOfBirth($dateOfBirth, $personalNumber){
+        $dateOfBirthErr = $this->checkInputData($dateOfBirth, "Date of birth", 2, false);
+        if(empty($dateOfBirthErr) && !empty($dateOfBirth)){
+            $dateOfBirthLocal = $this->removeSpaceAndhyphen($dateOfBirth);
+            $firstTwoDigit = substr($dateOfBirthLocal, 0, 2);
+            if(strlen($dateOfBirthLocal)!=8 ||( $firstTwoDigit !="19" && $firstTwoDigit!="20")){
+                $dateOfBirthErr ="Invalid date of birth. e.g 19671225 or 1967-12-25";
+            }
+            
+            //check with personal number
+            if(!empty($personalNumber)){
+                $dateOfBirthFromPersonNumber = $this->changePersonalNumberForm($this->getDateOfBirthFromPersonalNumber($personalNumber));
+                if($dateOfBirthLocal !=$dateOfBirthFromPersonNumber){
+                    $dateOfBirthErr ="Invalid date of birth, does not much with personal number";
+                }
+             }
+        }
+        return $dateOfBirthErr;
+        
+    }
+   
+    /**
+     * Get date of birth from personal number
+     * @param  $personalNumber
+     * @return string
+     */
+    function getDateOfBirthFromPersonalNumber($personalNumber){
+        $dateOfBirth="";
+        $personalNumberForm = $this->changePersonalNumberForm($personalNumber);
+        if(strlen($personalNumberForm)==12){
+            $dateOfBirth = substr($personalNumberForm, 0, 4)."-".substr($personalNumberForm, 4, 2)."-".substr($personalNumberForm, 6, 2);
+        }
+        return  $dateOfBirth;
+    }
+    
+    /**
+     * Check if email is already used.
+     * @param string $email of user.
+     * @return String
+     */
+     function checkEmailIfUsed($email){
+         $emailError ="";
+         if(!empty($email)){
+             $pdo = $this->pdo;
+             $stmt = $pdo->prepare('SELECT memberId FROM tblLogin where primaryEmail=? or email2=? limit 1');
+             $stmt->execute([$email, $email]);
+             if($stmt->rowCount() > 0){
+                 $emailError="This email is used by other";
+             }
+         }
+        return $emailError;
+    }
+    
+    /**
+     * Get the next free available member id.
+     * @return int availableId
+     */
+    function getAvailableMemberId(){
+        $pdo = $this->pdo;
+        $stmt = $pdo->prepare('SELECT * from tblMemberId limit 1');
+        $stmt->execute();
+        $row =$stmt->fetch();
+        return $row['availableId'];
+        
+    }
+    
+    /**
+     * Check if personal number is already used.
+     * @param string $personalNumber of user.
+     * @return String
+     */
+    function checkPersonalNumberIfUsed($personalNumber){
+        $personalNumberError="";
+        if(!empty($personalNumber)){
+            $pdo = $this->pdo;
+            $stmt = $pdo->prepare('SELECT peronalNumber FROM tblBasicInformation WHERE peronalNumber = ? limit 1');
+            $stmt->execute([$personalNumber]);
+            if($stmt->rowCount() > 0){
+                $personalNumberError="This personal number is used by other";
+            }
+        }
+        return $personalNumberError;
     }
     
     

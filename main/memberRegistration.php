@@ -25,8 +25,10 @@
  	    $kommun= $memberManagement->test_input($_POST["txtKommun"]);
  	    $country = $memberManagement->test_input($_POST["txtCountry"]);
  	    
- 	    $PersonalNumberErr =  $memberManagement->checkInputData($personalNumber, "Personal number", 2, true);
- 	    $dateOfBirthlErr = $memberManagement->checkInputData($dateOfBirth, "Date of birth", 2, true, "", "19671225 or 1967-12-25");
+ 	    //$personalNumberErr =  $memberManagement->checkInputData($personalNumber, "Personal number", 2, true);
+ 	    $personalNumberErr = $memberManagement->validatePersonalNumber($personalNumber);
+ 	    //$dateOfBirthlErr = $memberManagement->checkInputData($dateOfBirth, "Date of birth", 2, true, "", "19671225 or 1967-12-25");
+ 	    $dateOfBirthlErr = $memberManagement->validateDateOfBirth($dateOfBirth, $personalNumber);
  	    $firstNameErr = $memberManagement->checkInputData($firstName, "First name", 1, true);
  	    $fatherNameErr = $memberManagement->checkInputData($fatherName, "Father name", 1, false);
  	    $gFatherNameErr = $memberManagement->checkInputData($gFatherName, "G.Father/Last name", 1, true);
@@ -42,6 +44,79 @@
  	    $streetAddressErr = $memberManagement->checkInputData($streetAddress, "Street address", 10, true);
  	    $poBoxErr = $memberManagement->checkInputData($poBox, "Po.Box", 3, true);
  	    $kommunErr = $memberManagement->checkInputData($kommun, "Kommun", 1, true);
+ 	    
+ 	    
+ 	    //check the following fields if they have not be used before
+ 	    if(empty($personalNumberErr)){
+ 	        $personalNumberErr = $memberManagement->checkPersonalNumberIfUsed($personalNumber);
+ 	    }
+ 	    if(empty($primaryEmailErr)){
+ 	        $primaryEmailErr = $memberManagement->checkEmailIfUsed($primaryEmail);    
+ 	    }
+ 	    if(empty($email2Err)){
+ 	        $email2Err = $memberManagement->checkEmailIfUsed($email2);
+ 	    }
+ 	    
+ 	    //For time being, personal number if optional if date of birth specified
+ 	    if(empty($personalNumberErr) && !empty($dateOfBirthlErr) &&empty($dateOfBirth) ){
+ 	        $dateOfBirthlErr="";
+ 	    }else if(empty($dateOfBirthlErr) && !empty($personalNumberErr) && empty($personalNumber)){
+ 	        $personalNumberErr="";
+ 	    }
+ 	    $errorMessages = array("personalNumberErr"=>$personalNumberErr, 
+                     	        "dateOfBirthErr"=>$dateOfBirthlErr, 
+                     	        "firstNameErr"=>$firstNameErr,
+                     	        "fatherNameErr"=>$fatherNameErr,
+                     	        "gFatherNameErr"=>$gFatherNameErr,
+                     	        "sexErr"=>$sexErr,
+                     	        "primaryEmailErr"=>$primaryEmailErr,
+                     	        "email2Err"=>$email2Err,
+ 	                            "passwordErr"=>$passwordErr,
+                     	        "ConfirmPasswordErr"=>$ConfirmPasswordErr,
+                     	        "mobileNumberErr"=>$mobileNumberErr,
+                     	        "mobileNumber2Err"=>$mobileNumber2Err,
+                     	        "telephoneNumberErr"=>$telephoneNumberErr,
+                     	        "cityErr"=>$cityErr,
+                     	        "streetAddressErr"=>$streetAddressErr,
+                     	        "poBoxErr"=>$poBoxErr,
+                     	        "kommunErr"=>$kommunErr
+ 	    );
+ 	    $isValidData = true;
+ 	    foreach($errorMessages as $errorMessage => $errorMessage_value) {
+ 	        if(!empty($errorMessage_value)){
+ 	            $isValidData=false;
+ 	            $kommunErr = $errorMessage . " ". $errorMessage_value;
+ 	            break;
+ 	        }
+ 	        
+ 	    }
+ 	    
+ 	    if($isValidData){
+ 	        $memberId = $memberManagement->getAvailableMemberId();
+ 	        $memberData = array("memberId"=>$memberId,
+ 	            "personalNumber"=>$personalNumber,
+ 	            "dateOfBirth"=>$dateOfBirthl,
+ 	            "firstName"=>$firstName,
+ 	            "fatherName"=>$fatherName,
+ 	            "gFatherName"=>$gFatherName,
+ 	            "sex"=>$sex,
+ 	            "familyStatus"=>$maritalStatus,
+ 	            "residentStatus"=>$residenceStatus,
+ 	            "primaryEmail"=>$primaryEmail,
+ 	            "email2"=>$email2,
+ 	            "password"=>$password,
+ 	            "mobileNumber"=>$mobileNumber,
+ 	            "mobileNumber2"=>$mobileNumber2,
+ 	            "telephoneNumber"=>$telephoneNumber,
+ 	            "city"=>$city,
+ 	            "streetAddress"=>$streetAddress,
+ 	            "poBox"=>$poBox,
+ 	            "country"=>$country,
+ 	            "kommun"=>$kommun);
+ 	        $registrationSuccessful = $memberManagement->registerMember($memberData);
+ 	        $kommunErr = $registrationSuccessful;
+ 	    }
+ 	    
  	    
  	    
  	    
@@ -65,8 +140,10 @@
 
 <p><span class="error">* required field</span></p>
 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?> "id="memberRegistration">  
+  <span class="error"> <?php echo $registrationMessage;?></span>
+  <br><br>
   <label for="txtPersonalNumber">Personal number:</label><input type="text" name="txtPersonalNumber" value="<?php echo $personalNumber;?>">
-  <span class="error">* <?php echo $PersonalNumberErr;?></span>
+  <span class="error">* <?php echo $personalNumberErr;?></span>
   <br><br>
   <label for="txtDateOfBirth">Date of birth </label><input type="text" name="txtDateOfBirth" value="<?php echo $dateOfBirth;?>">
   <span class="error">* <?php echo $dateOfBirthlErr;?></span>
@@ -83,8 +160,8 @@
   <label for="selectSex">Sex</label> 
 <select name="selectSex" form="memberRegistration">
   <option value="0"<?php if(isset($sex) && $sex=="0") echo "selected = 'selected'";?>></option>
-  <option value="1"<?php if(isset($sex) && $sex=="1") echo "selected = 'selected'";?>>Male</option>
-  <option value="2"<?php if(isset($sex) && $sex=="2") echo "selected = 'selected'";?>>Female</option>
+  <option value="m"<?php if(isset($sex) && $sex=="m") echo "selected = 'selected'";?>>Male</option>
+  <option value="f"<?php if(isset($sex) && $sex=="f") echo "selected = 'selected'";?>>Female</option>
 </select>
 <span class="error"><?php echo $sexErr;?></span>
    <br><br>
