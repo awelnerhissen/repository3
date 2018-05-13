@@ -25,9 +25,25 @@
  	    $kommun= $memberManagement->test_input($_POST["txtKommun"]);
  	    $country = $memberManagement->test_input($_POST["txtCountry"]);
  	    
- 	    $PersonalNumberErr =  $memberManagement->checkInputData($personalNumber, "Personal number", 3, true);
+ 	    $PersonalNumberErr =  $memberManagement->checkInputData($personalNumber, "Personal number", 2, true);
  	    $dateOfBirthlErr = $memberManagement->checkInputData($dateOfBirth, "Date of birth", 2, true, "", "19671225 or 1967-12-25");
  	    $firstNameErr = $memberManagement->checkInputData($firstName, "First name", 1, true);
+ 	    $fatherNameErr = $memberManagement->checkInputData($fatherName, "Father name", 1, false);
+ 	    $gFatherNameErr = $memberManagement->checkInputData($gFatherName, "G.Father/Last name", 1, true);
+ 	    $sexErr=$memberManagement->checkSelectedSex($sex);
+ 	    $primaryEmailErr = $memberManagement->checkEmail($primaryEmail, true);
+ 	    $email2Err = $memberManagement->checkEmail($email2, false);
+ 	    $ConfirmPasswordErr=$passwordErr = $memberManagement->checkPassword($password, $confirmPassword, true);
+ 	    $mobileNumberErr = $memberManagement->checkMobileNumber($mobileNumber,true);
+ 	    $mobileNumber2Err  = $memberManagement->checkMobileNumber($mobileNumber2, false);
+ 	    $telephoneNumberErr  = $memberManagement->checkMobileNumber($telephoneNumber, false);
+ 	    
+ 	    $cityErr =$memberManagement->checkInputData($city, "City", 1, true);
+ 	    $streetAddressErr = $memberManagement->checkInputData($streetAddress, "Street address", 10, true);
+ 	    $poBoxErr = $memberManagement->checkInputData($poBox, "Po.Box", 3, true);
+ 	    $kommunErr = $memberManagement->checkInputData($kommun, "Kommun", 1, true);
+ 	    
+ 	    
  	    
  	}
  	
@@ -61,7 +77,7 @@
   <label for="txtFatherName">Father name:</label> <input type="text" name="txtFatherName" value="<?php echo $fatherName;?>">
   <span class="error"><?php echo $fatherNameErr;?></span>
   <br><br>
-  <label for="txtGFatherName">G.Father name:</label> <input type="text" name="txtGFatherName" value="<?php echo $gFatherName;?>">
+  <label for="txtGFatherName">G.Father/Last name:</label> <input type="text" name="txtGFatherName" value="<?php echo $gFatherName;?>">
   <span class="error"><?php echo $gFatherNameErr;?></span>
   <br><br>
   <label for="selectSex">Sex</label> 
@@ -69,8 +85,8 @@
   <option value="0"<?php if(isset($sex) && $sex=="0") echo "selected = 'selected'";?>></option>
   <option value="1"<?php if(isset($sex) && $sex=="1") echo "selected = 'selected'";?>>Male</option>
   <option value="2"<?php if(isset($sex) && $sex=="2") echo "selected = 'selected'";?>>Female</option>
-  <?php if (isset($gender) && $gender=="female") echo "checked";?>
 </select>
+<span class="error"><?php echo $sexErr;?></span>
    <br><br>
     <label for="selectMeritalStatus">Meriatal Status:</label> 
    <?php echo $memberManagement->getMeritalStatusSelect($maritalStatus);?>
