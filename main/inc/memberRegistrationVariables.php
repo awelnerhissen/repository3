@@ -42,5 +42,6 @@ $commulativeErr;
 $registrationMessage;
 $registrationSuccessful;
 $isValidData;
+$messageStyle;
 
 ?>
