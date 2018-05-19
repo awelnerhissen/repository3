@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: May 19, 2018 at 12:20 PM
+-- Generation Time: May 19, 2018 at 01:44 PM
 -- Server version: 5.7.22-0ubuntu0.16.04.1
 -- PHP Version: 7.0.28-0ubuntu0.16.04.1
 
@@ -43,7 +43,6 @@ CREATE TABLE `tblAcadamicAndProfession` (
 CREATE TABLE `tblBasicInformation` (
   `memberId` int(11) NOT NULL,
   `firstName` varchar(20) NOT NULL,
-  `fatherName` varchar(20) NOT NULL,
   `lastName` varchar(20) NOT NULL,
   `gender` char(1) NOT NULL,
   `dateOfBirth` date NOT NULL,
@@ -64,11 +63,8 @@ CREATE TABLE `tblBasicInformation` (
 CREATE TABLE `tblContactAddress` (
   `memberId` int(11) NOT NULL,
   `mobileNumber1` text NOT NULL,
-  `mobileNumber2` text NOT NULL,
-  `telephone` text NOT NULL,
   `country` varchar(20) NOT NULL,
-  `city` varchar(20) NOT NULL,
-  `kommun` varchar(20) NOT NULL,
+  `ort` varchar(20) NOT NULL,
   `streetAddress` varchar(20) NOT NULL,
   `poBox` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -103,7 +99,6 @@ INSERT INTO `tblFamilyStatusTypes` (`familyStatusId`, `familyStatusType`) VALUES
 CREATE TABLE `tblLogin` (
   `memberId` int(11) NOT NULL,
   `primaryEmail` varchar(50) NOT NULL,
-  `email2` varchar(50) DEFAULT NULL,
   `password` varchar(255) NOT NULL,
   `memberRole` int(11) NOT NULL,
   `confirmed` int(11) NOT NULL,
@@ -125,7 +120,7 @@ CREATE TABLE `tblMemberId` (
 --
 
 INSERT INTO `tblMemberId` (`availableId`) VALUES
-(1024);
+(1033);
 
 -- --------------------------------------------------------
 

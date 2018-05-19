@@ -266,15 +266,15 @@ class MemberManagement{
         }
         $pdo = $this->pdo;
         $pdo->beginTransaction();
-        $tblBasicInformation = "INSERT INTO tblBasicInformation (memberId, firstName, fatherName, lastName, gender, dateOfBirth, peronalNumber,familyStatus, residentStatus)
-                  VALUES (".$data['memberId']." , '".$data['firstName']."' , '".$data['fatherName']."' , '".$data['gFatherName']."' , '".$data['sex']."' , '".$date."' , ".$personalNumberWithoutSpace." , ".$data['familyStatus']." , ".$data['residentStatus'].")";
+        $tblBasicInformation = "INSERT INTO tblBasicInformation (memberId, firstName, lastName, gender, dateOfBirth, peronalNumber,familyStatus, residentStatus)
+                  VALUES (".$data['memberId']." , '".$data['firstName']."' , '".$data['gFatherName']."' , '".$data['sex']."' , '".$date."' , ".$personalNumberWithoutSpace." , ".$data['familyStatus']." , ".$data['residentStatus'].")";
         $pdo->exec($tblBasicInformation);
-        $tblLoginSql = "INSERT INTO tblLogin (memberId, primaryEmail, email2, password, memberRole, confirmed, ConfirmationCode)
-                  VALUES (".$data['memberId']." , '".$data['primaryEmail']."' , '".$data['email2']."' , '".$hashedPassword."' , 1, 1, 'confirmationCode')";
+        $tblLoginSql = "INSERT INTO tblLogin (memberId, primaryEmail, password, memberRole, confirmed, ConfirmationCode)
+                  VALUES (".$data['memberId']." , '".$data['primaryEmail']."' , '".$hashedPassword."' , 1, 1, 'confirmationCode')";
         $pdo->exec($tblLoginSql);
-        $tblContactAddress = "INSERT INTO tblContactAddress (memberId, mobileNumber1, mobileNumber2, telephone, country, city, kommun, streetAddress, poBox)
-                  VALUES (".$data['memberId']." , '".$data['mobileNumber']."' , '".$data['mobileNumber2']."' , '".$data['telephoneNumber']."' , '".
-                  $data['country']."' , '".$data['city']."' , '".$data['kommun']."' , '".$data['streetAddress']."' , '".$data['poBox']."')";
+        $tblContactAddress = "INSERT INTO tblContactAddress (memberId, mobileNumber1, country, ort, streetAddress, poBox)VALUES (".
+            $data['memberId']." , '".$data['mobileNumber']."' , '".$data['country']."' , '".$data['ort']."' , '".
+            $data['streetAddress']."' , '".$data['poBox']."')";
         $pdo->exec($tblContactAddress);
         $result = $pdo->commit();
         if($result){
@@ -298,7 +298,7 @@ class MemberManagement{
      * @return string empty string if $dateOfBirth is valid otherwise error message.
      */
     function validateDateOfBirth($dateOfBirth, $personalNumber){
-        $dateOfBirthErr = $this->checkInputData($dateOfBirth, "Date of birth", 2, false);
+        $dateOfBirthErr = $this->checkInputData($dateOfBirth, "Date of birth", 2, true);
         if(empty($dateOfBirthErr) && !empty($dateOfBirth)){
             $dateOfBirthLocal = $this->removeSpaceAndhyphen($dateOfBirth);
             $firstTwoDigit = substr($dateOfBirthLocal, 0, 2);

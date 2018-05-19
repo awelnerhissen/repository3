@@ -1,6 +1,9 @@
 .error {
 	color: #FF0000;
 }
+.oneOfThemRequired {
+	color: #e9b96e;
+}
 .successRegistration{
 	color: #00FF00;
 }
